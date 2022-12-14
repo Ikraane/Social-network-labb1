@@ -33,4 +33,9 @@ public class UserController {
         return iUserService.checkUserLogin(user);
     }
 
+    @GetMapping("/home")
+    public String home() {
+        return "Hello, JWT";
+    }
+
 }
