@@ -1,13 +1,20 @@
 package com.example.Socialnetwork.db;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import javax.persistence.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(name = "users")
-public class UserDB {
+public class UserDB implements UserDetails {
+
+    private static final long serialVersionUID = 1L;
+
     @Id
     @Column(name = "username")
     private String username;
@@ -18,14 +25,61 @@ public class UserDB {
     @Column(name = "lastname")
     private String lastname;
 
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "user")
+    private Set<Authorities> authorities = new HashSet<>();
+
+    @Override
     public String getUsername() {
         return username;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
     }
 
     public void setUsername(String username) {
         this.username = username;
     }
 
+    @Override
+    public Set<Authorities> getAuthorities() {
+        return authorities;
+    }
+
+    public void setAuthorities(Set<Authorities> authorities) {
+        this.authorities = authorities;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (this == null || getClass() != o.getClass()) return false;
+        UserDB userDB = (UserDB) o;
+        return username.equals(userDB.username);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(username);
+    }
+
+    @Override
     public String getPassword() {
         return password;
     }

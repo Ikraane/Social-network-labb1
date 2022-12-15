@@ -17,7 +17,7 @@ public class UserService implements IUserService{
         if (username == null) throw new IllegalArgumentException();
         else {
             User user = new User();
-            UserDB userDB = userRepository.getUserByUsername(username);
+            UserDB userDB = userRepository.getUserByUsername(username).get();
             if (userDB == null) throw new IllegalArgumentException();
             else {
                 user.setUsername(userDB.getUsername());
@@ -45,7 +45,7 @@ public class UserService implements IUserService{
 
     @Override
     public boolean checkUserLogin(User user) {
-        UserDB userDB = userRepository.getUserByUsername(user.getUsername());
+        UserDB userDB = userRepository.getUserByUsername(user.getUsername()).get();
         if(userDB == null) {
             return false;
         }
