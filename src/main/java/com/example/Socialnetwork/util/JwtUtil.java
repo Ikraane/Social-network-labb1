@@ -1,6 +1,7 @@
 package com.example.Socialnetwork.util;
 
 import java.io.Serializable;
+import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -44,7 +45,8 @@ public class JwtUtil implements Serializable {
     }
 
     private Claims getAllClaimsFromToken(String token) {
-        return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
+        String encodedSecret = Base64.getEncoder().encodeToString(secret.getBytes());
+        return Jwts.parser().setSigningKey(encodedSecret).parseClaimsJws(token).getBody();
     }
 
     private Boolean isTokenExpired(String token) {
@@ -68,13 +70,15 @@ public class JwtUtil implements Serializable {
     }
 
     private String doGenerateToken(Map<String, Object> claims, String subject) {
+        String encodedSecret = Base64.getEncoder().encodeToString(secret.getBytes());
 
+        System.out.println("secret : " + secret);
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(subject)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY * 1000))
-                .signWith(SignatureAlgorithm.HS512, secret).compact();
+                .signWith(SignatureAlgorithm.HS512, encodedSecret).compact();
     }
 
     public Boolean canTokenBeRefreshed(String token) {

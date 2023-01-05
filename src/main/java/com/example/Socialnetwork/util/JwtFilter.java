@@ -37,7 +37,6 @@ public class JwtFilter extends OncePerRequestFilter {
             return;
         }
 
-        // Authorization -> ([Bearer], [blablabla])
         final String token = header.split(" ")[1].trim().replaceAll("^\"|\"$", "");
 
         System.out.println("The token is: " + token);

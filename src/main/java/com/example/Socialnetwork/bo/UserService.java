@@ -11,6 +11,10 @@ public class UserService implements IUserService{
     @Autowired
     private UserRepository userRepository;
 
+    public UserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
     @Override
     public User getUserByUsername(String username) throws IllegalArgumentException{
 
@@ -33,14 +37,14 @@ public class UserService implements IUserService{
     }
 
     @Override
-    public UserDB saveUser(User user) {
+    public String saveUser(User user) {
         UserDB userDB = new UserDB();
         userDB.setUsername(user.getUsername());
         userDB.setPassword(user.getPassword());
         userDB.setFirstname(user.getFirstname());
         userDB.setLastname(user.getLastname());
 
-        return userRepository.save(userDB);
+        return user.getUsername();
     }
 
     @Override

@@ -1,12 +1,43 @@
 var app = require('express')();
 var http = require('http').createServer(app);
 var io = require('socket.io')(http);
-import {v4 as uuidv4} from "uuid" 
+require("dotenv").config();
+const jwt = require('jsonwebtoken');
 
+var jwtKey = btoa(process.env.SECRET); 
+var decodedKey = atob(jwtKey);
+const jwtExpirySeconds = 30000;
+
+io.use((socket, next) => {
+
+    const token = socket.handshake.headers["my-jwt"];
+    console.log("Secret key: " + jwtKey);
+    console.log("Welcome: " + token);
+    
+    var payload;
+    try {
+        payload = jwt.verify(token, decodedKey, {
+            algorithms: ["HS512"],
+        });
+        console.log("HEREEEEE");
+        next();
+    } catch (e) {
+    if (e instanceof jwt.JsonWebTokenError) {
+        // if the error thrown is because the JWT is unauthorized, return a 401 error
+        console.log(e.message);
+        console.log("ERROR");
+        return res.status(401).end();
+    }
+    // otherwise, return a bad request error
+    console.log("BAD REQUEST");
+    console.log(e.message);
+    return res.status(400).end();
+    }
+})
 
 
 io.on('connection', (socket)=> {
-    console.log('User Online' + socket.id);
+    console.log('User Online');
 
     socket.on('canvas-data', (data)=> {
         socket.broadcast.emit('canvas-data', data);
@@ -18,24 +49,3 @@ http.listen(server_port, () => {
     console.log("Started on : "+ server_port);
 })
 
-
-//ny
-/*
-io.use((socket, next) => {
-  
-    const username = socket.handshake.auth.username;
-    if(!username) {
-        return next(new Error("Invalid username"));
-    } 
-    socket.username = username,
-    socket.id = uuidv4();
-    next();
-  });
-
-  io.on('connection', (socket)=> {
-    console.log('User Online' + socket.id);
-    socket.emit("session", {userId: socket.userId, username: socket.username});
-    socket.on('canvas-data', (data)=> {
-        socket.broadcast.emit('canvas-data', data);
-    })
-})*/
